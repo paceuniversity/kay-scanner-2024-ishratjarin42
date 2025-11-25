@@ -62,8 +62,8 @@ public class TokenStream {
         if (isOperator(nextChar)) {
             char currentChar = nextChar;
             
-            // *** CRITICAL FIX: REMOVE PRE-SWITCH ADVANCE ***
-            // We now rely solely on the advance inside each token logic path.
+            // Advance nextChar for the lookahead before the switch starts (Standard approach)
+            nextChar = readChar(); 
 
             switch (currentChar) {
                 case '+':
@@ -74,43 +74,39 @@ public class TokenStream {
                     // These are always single-character Operators.
                     t.setType("Operator");
                     t.setValue(String.valueOf(currentChar));
-                    // CRITICAL FIX: Advance stream to consume the character.
+                    // CRITICAL FIX: The character was advanced *before* the switch. 
+                    // To move to the *next* token, we need one more advance to consume the current token.
                     nextChar = readChar(); 
                     return t;
                     
                 case '<':
                 case '>':
                     t.setType("Operator");
-                    // ADVANCE here to get lookahead
-                    nextChar = readChar(); 
                     if (nextChar == '=') {
                         t.setValue(String.valueOf(currentChar) + nextChar); 
-                        nextChar = readChar(); // Consume the '='
+                        nextChar = readChar(); // Consume the '=' (double advance)
                     } else {
                         t.setValue(String.valueOf(currentChar));
-                        // The single char was consumed by the lookahead (line 148), 
-                        // so no extra advance is needed here.
+                        // FIX: Must advance stream here if it was only a single operator.
+                        nextChar = readChar();
                     }
                     return t;
 
                 case '!':
-                    // ADVANCE here to get lookahead
-                    nextChar = readChar(); 
                     // ! is Other, != and !| are Operator
                     if (nextChar == '=' || nextChar == '|') {
                         t.setType("Operator");
                         t.setValue(String.valueOf(currentChar) + nextChar); 
-                        nextChar = readChar(); // Consume lookahead character
+                        nextChar = readChar(); // Consume lookahead character (double advance)
                     } else {
                         t.setType("Other"); // Single !
                         t.setValue(String.valueOf(currentChar));
-                        // The single char was consumed by the lookahead (line 159).
+                        // FIX: Must advance stream here if it was only a single '!'
+                        nextChar = readChar();
                     }
                     return t;
 
                 case '*': 
-                    // ADVANCE here to get lookahead
-                    nextChar = readChar(); 
                     // Fix for doubleStarSymbolIsOperatorOperator() test: Treat ** as two separate tokens.
                     t.setType("Operator");
                     if (nextChar == '*') {
@@ -119,74 +115,72 @@ public class TokenStream {
                         // DO NOT call readChar().
                     } else {
                         t.setValue(String.valueOf(currentChar));
-                        // The single char was consumed by the lookahead (line 172).
+                        // FIX: Must advance stream here if it was only a single '*'
+                        nextChar = readChar();
                     }
                     return t;
                     
                 case '=':
-                    // ADVANCE here to get lookahead
-                    nextChar = readChar(); 
                     // = is Other, == is Operator
                     if (nextChar == '=') {
                         t.setType("Operator");
                         t.setValue("=="); 
-                        nextChar = readChar(); // Consume '='
+                        nextChar = readChar(); // Consume '=' (double advance)
                     } else {
                         t.setType("Other"); // Single =
                         t.setValue(String.valueOf(currentChar));
-                        // The single char was consumed by the lookahead (line 186).
+                        // FIX: Must advance stream here if it was only a single '='
+                        nextChar = readChar();
                     }
                     return t;
 
                 case ':':
-                    // ADVANCE here to get lookahead
-                    nextChar = readChar(); 
                     // : is Other, := is Operator
                     if (nextChar == '=') {
                         t.setType("Operator");
                         t.setValue(":="); 
-                        nextChar = readChar(); // Consume '='
+                        nextChar = readChar(); // Consume '=' (double advance)
                     } else {
                         t.setType("Other"); // Single :
                         t.setValue(String.valueOf(currentChar));
-                        // The single char was consumed by the lookahead (line 199).
+                        // FIX: Must advance stream here if it was only a single ':'
+                        nextChar = readChar();
                     }
                     return t;
 
                 case '|':
-                    // ADVANCE here to get lookahead
-                    nextChar = readChar(); 
                     // | is Other, || is Operator
                     if (nextChar == '|') {
                         t.setType("Operator");
                         t.setValue("||");
-                        nextChar = readChar(); // Consume '|'
+                        nextChar = readChar(); // Consume '|' (double advance)
                     } else {
                         t.setType("Other"); // Single |
                         t.setValue(String.valueOf(currentChar));
-                        // The single char was consumed by the lookahead (line 212).
+                        // FIX: Must advance stream here if it was only a single '|'
+                        nextChar = readChar();
                     }
                     return t;
 
                 case '&':
-                    // ADVANCE here to get lookahead
-                    nextChar = readChar(); 
                     // & is Other, && is Operator
                     if (nextChar == '&') {
                         t.setType("Operator");
                         t.setValue("&&");
-                        nextChar = readChar(); // Consume '&'
+                        nextChar = readChar(); // Consume '&' (double advance)
                     } else {
                         t.setType("Other"); // Single &
                         t.setValue(String.valueOf(currentChar));
-                        // The single char was consumed by the lookahead (line 225).
+                        // FIX: Must advance stream here if it was only a single '&'
+                        nextChar = readChar();
                     }
                     return t;
                 
                 default:
                     t.setType("Other");
                     t.setValue(String.valueOf(currentChar));
-                    // The character was consumed by the lookahead (line 233).
+                    // FIX: Must advance stream here if it hit the default case.
+                    nextChar = readChar();
                     return t;
             }
         }
@@ -230,10 +224,9 @@ public class TokenStream {
         }
 
         // 6. Final catch-all for single "Other" characters
-        // This handles symbols like [ ] @ . that were not caught by isOperator or isSeparator
         if (!isEof) {
             t.setValue(String.valueOf(nextChar));
-            nextChar = readChar(); // CRITICAL FIX: Advance stream to consume the 'Other' character
+            nextChar = readChar(); 
             t.setType("Other");
             return t;
         }
