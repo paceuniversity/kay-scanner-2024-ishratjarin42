@@ -74,22 +74,24 @@ public class TokenStream {
             return t;
         }
         
-        // 4. Operators / Others (Handled via switch, now fully consuming the character inside the block)
+        // 4. Operators / Others (Handled via lookahead in switch)
         if (isOperator(nextChar)) {
             char currentChar = nextChar;
-            nextChar = readChar(); // Read the lookahead now (except for the * case below)
+            
+            // Advance nextChar for the lookahead before the switch starts (Standard approach)
+            nextChar = readChar(); 
 
             switch (currentChar) {
-                // Single-character operators that were causing the stream skip
                 case '+':
                 case '-':
                 case '%':
                 case '^':
                 case '~':
+                    // These are always single-character Operators.
                     t.setType("Operator");
                     t.setValue(String.valueOf(currentChar));
-                    // nextChar already holds the next token's first character (the '5' in '-5').
-                    // DO NOT call readChar() again. The read happened above (nextChar = readChar();)
+                    // REVERTED to original stream logic: consume the character read before the switch
+                    nextChar = readChar(); 
                     return t; 
                     
                 case '<':
@@ -100,35 +102,38 @@ public class TokenStream {
                         nextChar = readChar(); // Consume the '='
                     } else {
                         t.setValue(String.valueOf(currentChar));
-                        // nextChar holds the lookahead, correct for next token
+                        nextChar = readChar(); // Consume the character
                     }
                     return t;
 
                 case '!':
+                    // *** FINAL FIX FOR !: Classify single ! as Operator, not Other, to resolve !| failure ***
                     if (nextChar == '=' || nextChar == '|') {
                         t.setType("Operator"); 
                         t.setValue(String.valueOf(currentChar) + nextChar); 
                         nextChar = readChar(); // Consume lookahead character
                     } else {
-                        t.setType("Operator"); // Single ! is an Operator
+                        t.setType("Operator"); // Changed from "Other" to "Operator"
                         t.setValue(String.valueOf(currentChar));
-                        // nextChar holds the lookahead, correct for next token
+                        nextChar = readChar(); // Consume the character
                     }
                     return t;
 
                 case '*': 
+                    // Fix for doubleStarSymbolIsOperatorOperator() test: Treat ** as two separate tokens.
                     t.setType("Operator");
                     if (nextChar == '*') {
                         t.setValue(String.valueOf(currentChar)); // Return the first *
-                        // DO NOT consume the second '*', let the next call handle it.
-                        // nextChar already holds the second '*', correct for next token
+                        // nextChar still holds the second '*', ready for the next nextToken() call.
+                        // DO NOT call readChar().
                     } else {
                         t.setValue(String.valueOf(currentChar));
-                        // nextChar holds the lookahead, correct for next token
+                        nextChar = readChar(); // Consume the character
                     }
                     return t;
                     
                 case '=':
+                    // = is Other, == is Operator
                     if (nextChar == '=') {
                         t.setType("Operator");
                         t.setValue("=="); 
@@ -136,11 +141,12 @@ public class TokenStream {
                     } else {
                         t.setType("Other"); // Single =
                         t.setValue(String.valueOf(currentChar));
-                        // nextChar holds the lookahead, correct for next token
+                        nextChar = readChar(); // Consume the character
                     }
                     return t;
 
                 case ':':
+                    // : is Other, := is Operator
                     if (nextChar == '=') {
                         t.setType("Operator");
                         t.setValue(":="); 
@@ -148,11 +154,12 @@ public class TokenStream {
                     } else {
                         t.setType("Other"); // Single :
                         t.setValue(String.valueOf(currentChar));
-                        // nextChar holds the lookahead, correct for next token
+                        nextChar = readChar(); // Consume the character
                     }
                     return t;
 
                 case '|':
+                    // | is Other, || is Operator
                     if (nextChar == '|') {
                         t.setType("Operator");
                         t.setValue("||");
@@ -160,11 +167,12 @@ public class TokenStream {
                     } else {
                         t.setType("Other"); // Single |
                         t.setValue(String.valueOf(currentChar));
-                        // nextChar holds the lookahead, correct for next token
+                        nextChar = readChar(); // Consume the character
                     }
                     return t;
 
                 case '&':
+                    // & is Other, && is Operator
                     if (nextChar == '&') {
                         t.setType("Operator");
                         t.setValue("&&");
@@ -172,14 +180,14 @@ public class TokenStream {
                     } else {
                         t.setType("Other"); // Single &
                         t.setValue(String.valueOf(currentChar));
-                        // nextChar holds the lookahead, correct for next token
+                        nextChar = readChar(); // Consume the character
                     }
                     return t;
                 
                 default:
                     t.setType("Other");
                     t.setValue(String.valueOf(currentChar));
-                    // nextChar holds the lookahead, correct for next token
+                    nextChar = readChar(); // Consume the character
                     return t;
             }
         }
