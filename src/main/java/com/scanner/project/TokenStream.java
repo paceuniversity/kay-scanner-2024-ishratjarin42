@@ -226,7 +226,7 @@ public class TokenStream {
         // This handles symbols like [ ] @ . that were not caught by isOperator or isSeparator
         if (!isEof) {
             t.setValue(String.valueOf(nextChar));
-            nextChar = readChar(); 
+            nextChar = readChar(); // CRITICAL FIX: Advance stream to consume the 'Other' character
             t.setType("Other");
             return t;
         }
