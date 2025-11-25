@@ -57,8 +57,24 @@ public class TokenStream {
                 return t;
             }
         }
+        
+        // 2. Separators
+        if (isSeparator(nextChar)) {
+            t.setType("Separator");
+            t.setValue(String.valueOf(nextChar));
+            nextChar = readChar();
+            return t;
+        }
 
-        // 2. Operators / Others (Handled via lookahead in switch)
+        // 3. Explicit Single-Character Other Tokens (CRITICAL FIX FOR [ ] @ . )
+        if (nextChar == '[' || nextChar == ']' || nextChar == '@' || nextChar == '.') {
+            t.setType("Other");
+            t.setValue(String.valueOf(nextChar));
+            nextChar = readChar();
+            return t;
+        }
+        
+        // 4. Operators / Others (Handled via lookahead in switch)
         if (isOperator(nextChar)) {
             char currentChar = nextChar;
             
@@ -184,15 +200,7 @@ public class TokenStream {
             }
         }
 
-        // 3. Separators
-        if (isSeparator(nextChar)) {
-            t.setType("Separator");
-            t.setValue(String.valueOf(nextChar));
-            nextChar = readChar();
-            return t;
-        }
-
-        // 4. Identifier / Keyword / Boolean Literal
+        // 5. Identifier / Keyword / Boolean Literal
         if (isLetter(nextChar)) {
             t.setType("Identifier");
             while (isLetter(nextChar) || isDigit(nextChar)) {
@@ -211,7 +219,7 @@ public class TokenStream {
             return t; 
         }
 
-        // 5. Integer Literal
+        // 6. Integer Literal
         if (isDigit(nextChar)) {
             t.setType("Literal");
             while (isDigit(nextChar)) {
@@ -221,8 +229,8 @@ public class TokenStream {
 
             return t;
         }
-        
-        // 6. Final catch-all for single "Other" characters (This handles the dot/period)
+
+        // 7. Final catch-all for single "Other" characters
         if (!isEof) {
             t.setValue(String.valueOf(nextChar));
             nextChar = readChar(); 
