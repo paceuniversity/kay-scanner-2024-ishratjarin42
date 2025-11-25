@@ -74,8 +74,7 @@ public class TokenStream {
                     // These are always single-character Operators.
                     t.setType("Operator");
                     t.setValue(String.valueOf(currentChar));
-                    // CRITICAL FIX: The character was advanced *before* the switch. 
-                    // To move to the *next* token, we need one more advance to consume the current token.
+                    // CRITICAL FIX: Advance stream to consume the character.
                     nextChar = readChar(); 
                     return t;
                     
@@ -222,8 +221,17 @@ public class TokenStream {
 
             return t;
         }
+        
+        // ** CRITICAL FIX FOR THE PERIOD/DOT **
+        // 6. Handle Period as Other 
+        if (nextChar == '.') {
+            t.setType("Other");
+            t.setValue(String.valueOf(nextChar));
+            nextChar = readChar();
+            return t;
+        }
 
-        // 6. Final catch-all for single "Other" characters
+        // 7. Final catch-all for single "Other" characters
         if (!isEof) {
             t.setValue(String.valueOf(nextChar));
             nextChar = readChar(); 
