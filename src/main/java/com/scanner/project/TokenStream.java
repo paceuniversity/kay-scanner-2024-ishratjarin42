@@ -71,10 +71,11 @@ public class TokenStream {
                 case '%':
                 case '^':
                 case '~':
-                    // These are always single-character Operators. nextChar already holds the next token.
+                    // These are always single-character Operators.
                     t.setType("Operator");
                     t.setValue(String.valueOf(currentChar));
-                    // NO stream advance here.
+                    // CRITICAL FIX: Advance stream to consume the character.
+                    nextChar = readChar(); 
                     return t;
                     
                 case '<':
@@ -85,7 +86,8 @@ public class TokenStream {
                         nextChar = readChar(); // Consume the '='
                     } else {
                         t.setValue(String.valueOf(currentChar));
-                        // NO stream advance here.
+                        // FIX: Must advance stream here if it was only a single operator.
+                        nextChar = readChar();
                     }
                     return t;
 
@@ -98,12 +100,13 @@ public class TokenStream {
                     } else {
                         t.setType("Other"); // Single !
                         t.setValue(String.valueOf(currentChar));
-                        // NO stream advance here.
+                        // FIX: Must advance stream here if it was only a single '!'
+                        nextChar = readChar();
                     }
                     return t;
 
                 case '*': 
-                    // CRITICAL FIX for doubleStarSymbolIsOperatorOperator() test: Treat ** as two separate tokens.
+                    // Fix for doubleStarSymbolIsOperatorOperator() test: Treat ** as two separate tokens.
                     t.setType("Operator");
                     if (nextChar == '*') {
                         t.setValue(String.valueOf(currentChar)); // Return the first *
@@ -111,7 +114,8 @@ public class TokenStream {
                         // DO NOT call readChar().
                     } else {
                         t.setValue(String.valueOf(currentChar));
-                        // NO stream advance here.
+                        // FIX: Must advance stream here if it was only a single '*'
+                        nextChar = readChar();
                     }
                     return t;
                     
@@ -124,7 +128,8 @@ public class TokenStream {
                     } else {
                         t.setType("Other"); // Single =
                         t.setValue(String.valueOf(currentChar));
-                        // NO stream advance here.
+                        // FIX: Must advance stream here if it was only a single '='
+                        nextChar = readChar();
                     }
                     return t;
 
@@ -137,7 +142,8 @@ public class TokenStream {
                     } else {
                         t.setType("Other"); // Single :
                         t.setValue(String.valueOf(currentChar));
-                        // NO stream advance here.
+                        // FIX: Must advance stream here if it was only a single ':'
+                        nextChar = readChar();
                     }
                     return t;
 
@@ -150,7 +156,8 @@ public class TokenStream {
                     } else {
                         t.setType("Other"); // Single |
                         t.setValue(String.valueOf(currentChar));
-                        // NO stream advance here.
+                        // FIX: Must advance stream here if it was only a single '|'
+                        nextChar = readChar();
                     }
                     return t;
 
@@ -163,13 +170,16 @@ public class TokenStream {
                     } else {
                         t.setType("Other"); // Single &
                         t.setValue(String.valueOf(currentChar));
-                        // NO stream advance here.
+                        // FIX: Must advance stream here if it was only a single '&'
+                        nextChar = readChar();
                     }
                     return t;
                 
                 default:
                     t.setType("Other");
                     t.setValue(String.valueOf(currentChar));
+                    // FIX: Must advance stream here if it hit the default case.
+                    nextChar = readChar();
                     return t;
             }
         }
@@ -213,6 +223,7 @@ public class TokenStream {
         }
 
         // 6. Final catch-all for single "Other" characters
+        // This handles symbols like [ ] @ . that were not caught by isOperator or isSeparator
         if (!isEof) {
             t.setValue(String.valueOf(nextChar));
             nextChar = readChar(); 
@@ -304,4 +315,3 @@ public class TokenStream {
         return isEof;
     }
 }
-
