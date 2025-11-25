@@ -37,8 +37,9 @@ public class TokenStream {
             return t;
         }
 
-        // 1. Handle comments and division operator
+        // 1. Handle comments
         while (nextChar == '/') {
+            char tempChar = nextChar;
             nextChar = readChar();
             if (nextChar == '/') {
                 // Skip comment until end of line
@@ -50,64 +51,106 @@ public class TokenStream {
                 }
                 skipWhiteSpace();
             } else {
+                // Single '/' is Division Operator
                 t.setType("Operator");
-                t.setValue("/");
+                t.setValue(String.valueOf(tempChar));
                 return t;
             }
         }
 
-        // 2. Operators
+        // 2. Operators / Others (Handled via lookahead in switch)
         if (isOperator(nextChar)) {
-            t.setType("Operator");
             char currentChar = nextChar;
-            
-            // Check for multi-character operators that require special handling (**, !|)
-            if (currentChar == '*') {
-                nextChar = readChar();
-                if (nextChar == '*') {
-                    t.setValue("**"); 
-                    nextChar = readChar();
-                } else {
-                    t.setValue(String.valueOf(currentChar));
-                }
-                return t;
-            } else if (currentChar == '!') {
-                nextChar = readChar();
-                if (nextChar == '=' || nextChar == '|') { 
-                    t.setValue(String.valueOf(currentChar) + nextChar);
-                    nextChar = readChar();
-                } else {
-                    t.setValue(String.valueOf(currentChar));
-                    t.setType("Other"); // Single '!' is 'Other'
-                }
-                return t;
-            } 
-            
-            // For all other operators, perform single lookahead for two-character tokens
-            nextChar = readChar(); // Consume the currentChar and look ahead
+            nextChar = readChar(); // Advance for lookahead
 
-            // Check for multi-character tokens
-            if (currentChar == '=' && nextChar == '=') {
-                t.setValue("=="); nextChar = readChar(); return t;
-            } else if (currentChar == '|' && nextChar == '|') {
-                t.setValue("||"); nextChar = readChar(); return t;
-            } else if (currentChar == '&' && nextChar == '&') {
-                t.setValue("&&"); nextChar = readChar(); return t;
-            } else if (currentChar == ':' && nextChar == '=') {
-                t.setValue(":="); nextChar = readChar(); return t;
-            } else if ((currentChar == '<' || currentChar == '>') && nextChar == '=') {
-                t.setValue(String.valueOf(currentChar) + "="); nextChar = readChar(); return t;
+            switch (currentChar) {
+                case '<':
+                case '>':
+                    t.setType("Operator");
+                    if (nextChar == '=') {
+                        t.setValue(String.valueOf(currentChar) + nextChar); 
+                        nextChar = readChar();
+                    } else {
+                        t.setValue(String.valueOf(currentChar));
+                    }
+                    return t;
+
+                case '!':
+                    // ! is Other, != and !| are Operator
+                    if (nextChar == '=' || nextChar == '|') {
+                        t.setType("Operator");
+                        t.setValue(String.valueOf(currentChar) + nextChar); 
+                        nextChar = readChar();
+                    } else {
+                        t.setType("Other"); // Single !
+                        t.setValue(String.valueOf(currentChar));
+                    }
+                    return t;
+
+                case '=':
+                    // = is Other, == is Operator
+                    if (nextChar == '=') {
+                        t.setType("Operator");
+                        t.setValue("=="); 
+                        nextChar = readChar();
+                    } else {
+                        t.setType("Other"); // Single =
+                        t.setValue(String.valueOf(currentChar));
+                    }
+                    return t;
+
+                case ':':
+                    // : is Other, := is Operator
+                    if (nextChar == '=') {
+                        t.setType("Operator");
+                        t.setValue(":="); 
+                        nextChar = readChar();
+                    } else {
+                        t.setType("Other"); // Single :
+                        t.setValue(String.valueOf(currentChar));
+                    }
+                    return t;
+
+                case '|':
+                    // | is Other, || is Operator
+                    if (nextChar == '|') {
+                        t.setType("Operator");
+                        t.setValue("||");
+                        nextChar = readChar();
+                    } else {
+                        t.setType("Other"); // Single |
+                        t.setValue(String.valueOf(currentChar));
+                    }
+                    return t;
+
+                case '&':
+                    // & is Other, && is Operator
+                    if (nextChar == '&') {
+                        t.setType("Operator");
+                        t.setValue("&&");
+                        nextChar = readChar();
+                    } else {
+                        t.setType("Other"); // Single &
+                        t.setValue(String.valueOf(currentChar));
+                    }
+                    return t;
+                
+                case '*': 
+                    // * is Operator, ** is Operator
+                    t.setType("Operator");
+                    if (nextChar == '*') {
+                        t.setValue("**"); 
+                        nextChar = readChar();
+                    } else {
+                        t.setValue(String.valueOf(currentChar));
+                    }
+                    return t;
+                
+                default: // Handles single +, -, %, ^, ~
+                    t.setType("Operator");
+                    t.setValue(String.valueOf(currentChar));
+                    return t;
             }
-            
-            // Default: It is a single-character operator (or other single symbol)
-            t.setValue(String.valueOf(currentChar));
-            
-            // Final type assignment for single characters which are 'Other'
-            if (t.getValue().equals("=") || t.getValue().equals("|") || t.getValue().equals("&") || t.getValue().equals(":")) {
-                 t.setType("Other");
-            }
-            // All others (+, -, %, ^, ~, <, >) remain Operator
-            return t;
         }
 
         // 3. Separators
@@ -128,7 +171,6 @@ public class TokenStream {
             
             String value = t.getValue();
 
-            // Logic: True/False are Literals. All keywords are Keywords. All others (including true/false) are Identifiers.
             if (value.equals("True") || value.equals("False")) {
                  t.setType("Literal");
             } else if (isKeyword(value)) {
@@ -241,5 +283,4 @@ public class TokenStream {
         return isEof;
     }
 }
-
 
