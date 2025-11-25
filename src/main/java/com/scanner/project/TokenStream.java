@@ -73,14 +73,22 @@ public class TokenStream {
                     return t;
 
                 case '=':
-                case '!':
                     nextChar = readChar();
                     if (nextChar == '=') {
                         t.setValue(t.getValue() + nextChar); 
-                        t.setType("Operator"); // e.g., '==' or '!='
                         nextChar = readChar();
                     } else {
-                        t.setType("Other"); // FIX: Single '=', '!' are 'Other'
+                        t.setType("Other"); // Single '=' is 'Other'
+                    }
+                    return t;
+
+                case '!':
+                    nextChar = readChar();
+                    if (nextChar == '=' || nextChar == '|') { // FIX: Check for != and !|
+                        t.setValue(t.getValue() + nextChar); 
+                        nextChar = readChar();
+                    } else {
+                        t.setType("Other"); // Single '!' is 'Other'
                     }
                     return t;
 
@@ -107,10 +115,10 @@ public class TokenStream {
                 case '*': 
                     nextChar = readChar();
                     if (nextChar == '*') {
-                        t.setValue(t.getValue() + nextChar); 
+                        t.setValue(t.getValue() + nextChar); // FIX: Captures '**' as one token
                         nextChar = readChar();
                     }
-                    // If single '*' or '**', it returns. '**' is correctly captured as one token.
+                    // If single '*' or '**', it returns.
                     return t;
                 
                 case ':':
@@ -147,14 +155,13 @@ public class TokenStream {
             
             String value = t.getValue();
 
-            // FIX: Corrected Logic based on failures (true/false are Identifiers, True/False are Literals)
+            // Logic: True/False are Literals. All keywords (like main, int) are Keywords. All others (including true/false) are Identifiers.
             if (value.equals("True") || value.equals("False")) {
                  t.setType("Literal");
             } else if (isKeyword(value)) {
                 t.setType("Keyword");
             }
-            // If it's "true" or "false" (lowercase), it correctly stays "Identifier".
-
+            // Fixes 'capitalXLowercaseYNum1IsIdentifier()' because stream is now clean.
             return t; 
         }
 
@@ -181,6 +188,7 @@ public class TokenStream {
     }
 
     private char readChar() {
+        // ... (readChar method is unchanged)
         int i = 0;
         if (isEof)
             return (char) 0;
@@ -261,4 +269,3 @@ public class TokenStream {
         return isEof;
     }
 }
-
