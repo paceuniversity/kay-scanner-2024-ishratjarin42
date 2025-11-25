@@ -59,82 +59,84 @@ public class TokenStream {
         // 2. Operators
         if (isOperator(nextChar)) {
             t.setType("Operator");
-            t.setValue(t.getValue() + nextChar);
-            char currentChar = t.getValue().charAt(0);
-
-            switch (currentChar) {
-                case '<':
-                case '>':
+            char currentChar = nextChar;
+            
+            // Handle multi-character operators first for lookahead
+            if (currentChar == '*') {
+                nextChar = readChar();
+                if (nextChar == '*') {
+                    t.setValue("**"); // Specifically for the doubleStarSymbol test
                     nextChar = readChar();
-                    if (nextChar == '=') {
-                        t.setValue(t.getValue() + nextChar); 
-                        nextChar = readChar();
-                    }
-                    return t;
-
-                case '=':
+                } else {
+                    t.setValue(String.valueOf(currentChar));
+                }
+                return t;
+            } else if (currentChar == '!') {
+                nextChar = readChar();
+                if (nextChar == '=' || nextChar == '|') { // Check for != and !|
+                    t.setValue("!" + nextChar);
                     nextChar = readChar();
-                    if (nextChar == '=') {
-                        t.setValue(t.getValue() + nextChar); 
-                        nextChar = readChar();
-                    } else {
-                        t.setType("Other"); // Single '=' is 'Other'
-                    }
-                    return t;
-
-                case '!':
+                } else {
+                    t.setValue(String.valueOf(currentChar));
+                    t.setType("Other"); // Single '!' is 'Other'
+                }
+                return t;
+            } else if (currentChar == '=') {
+                 nextChar = readChar();
+                if (nextChar == '=') {
+                    t.setValue("=="); 
                     nextChar = readChar();
-                    if (nextChar == '=' || nextChar == '|') { // FIX: Check for != and !|
-                        t.setValue(t.getValue() + nextChar); 
-                        nextChar = readChar();
-                    } else {
-                        t.setType("Other"); // Single '!' is 'Other'
-                    }
-                    return t;
-
-                case '|':
+                } else {
+                    t.setValue(String.valueOf(currentChar));
+                    t.setType("Other"); // Single '=' is 'Other'
+                }
+                return t;
+            } else if (currentChar == ':') {
+                 nextChar = readChar();
+                if (nextChar == '=') {
+                    t.setValue(":="); 
                     nextChar = readChar();
-                    if (nextChar == '|') {
-                        t.setValue(t.getValue() + nextChar);
-                        nextChar = readChar();
-                    } else {
-                        t.setType("Other"); 
-                    }
-                    return t;
-
-                case '&':
+                } else {
+                    t.setValue(String.valueOf(currentChar));
+                    t.setType("Other"); // Single ':' is 'Other'
+                }
+                return t;
+            } else if (currentChar == '|') {
+                nextChar = readChar();
+                if (nextChar == '|') {
+                    t.setValue("||");
                     nextChar = readChar();
-                    if (nextChar == '&') {
-                        t.setValue(t.getValue() + nextChar);
-                        nextChar = readChar();
-                    } else {
-                        t.setType("Other"); 
-                    }
-                    return t;
-                
-                case '*': 
+                } else {
+                    t.setValue(String.valueOf(currentChar));
+                    t.setType("Other"); // Single '|' is 'Other'
+                }
+                return t;
+            } else if (currentChar == '&') {
+                nextChar = readChar();
+                if (nextChar == '&') {
+                    t.setValue("&&");
                     nextChar = readChar();
-                    if (nextChar == '*') {
-                        t.setValue(t.getValue() + nextChar); // FIX: Captures '**' as one token
-                        nextChar = readChar();
-                    }
-                    // If single '*' or '**', it returns.
-                    return t;
-                
-                case ':':
+                } else {
+                    t.setValue(String.valueOf(currentChar));
+                    t.setType("Other"); // Single '&' is 'Other'
+                }
+                return t;
+            } else if (currentChar == '<' || currentChar == '>') {
+                // Single/Double < and > operators
+                nextChar = readChar();
+                if (nextChar == '=') {
+                    t.setValue(String.valueOf(currentChar) + nextChar); 
                     nextChar = readChar();
-                    if (nextChar == '=') {
-                        t.setValue(t.getValue() + nextChar); 
-                        nextChar = readChar();
-                    } else {
-                        t.setType("Other"); // Single ':' is Other
-                    }
-                    return t;
-
-                default: // Handles +, -, %, ^, ~
-                    nextChar = readChar();
-                    return t;
+                } else {
+                    t.setValue(String.valueOf(currentChar));
+                }
+                return t;
             }
+            
+            // Default for single-character operators (+, -, %, ^, ~)
+            t.setValue(String.valueOf(currentChar));
+            nextChar = readChar();
+            return t;
         }
 
         // 3. Separators
@@ -155,13 +157,12 @@ public class TokenStream {
             
             String value = t.getValue();
 
-            // Logic: True/False are Literals. All keywords (like main, int) are Keywords. All others (including true/false) are Identifiers.
             if (value.equals("True") || value.equals("False")) {
                  t.setType("Literal");
             } else if (isKeyword(value)) {
                 t.setType("Keyword");
             }
-            // Fixes 'capitalXLowercaseYNum1IsIdentifier()' because stream is now clean.
+            // All other valid identifier combinations (like Xy1, true, false) remain Identifier.
             return t; 
         }
 
@@ -188,7 +189,6 @@ public class TokenStream {
     }
 
     private char readChar() {
-        // ... (readChar method is unchanged)
         int i = 0;
         if (isEof)
             return (char) 0;
@@ -269,3 +269,4 @@ public class TokenStream {
         return isEof;
     }
 }
+
