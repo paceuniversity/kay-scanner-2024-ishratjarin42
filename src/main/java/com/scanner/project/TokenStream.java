@@ -90,8 +90,8 @@ public class TokenStream {
                     // These are always single-character Operators.
                     t.setType("Operator");
                     t.setValue(String.valueOf(currentChar));
-                    // REVERTED to original stream logic: consume the character read before the switch
-                    nextChar = readChar(); 
+                    // *** CRITICAL FIX: Removed the extra readChar() that was skipping the next token. ***
+                    // nextChar = readChar(); 
                     return t; 
                     
                 case '<':
@@ -102,20 +102,20 @@ public class TokenStream {
                         nextChar = readChar(); // Consume the '='
                     } else {
                         t.setValue(String.valueOf(currentChar));
-                        nextChar = readChar(); // Consume the character
+                        // No readChar() needed, character consumed before switch
                     }
                     return t;
 
                 case '!':
-                    // *** FINAL FIX FOR !: Classify single ! as Operator, not Other, to resolve !| failure ***
+                    // ! is Operator (as fixed previously), != and !| are Operator
                     if (nextChar == '=' || nextChar == '|') {
                         t.setType("Operator"); 
                         t.setValue(String.valueOf(currentChar) + nextChar); 
                         nextChar = readChar(); // Consume lookahead character
                     } else {
-                        t.setType("Operator"); // Changed from "Other" to "Operator"
+                        t.setType("Operator"); 
                         t.setValue(String.valueOf(currentChar));
-                        nextChar = readChar(); // Consume the character
+                        // No readChar() needed, character consumed before switch
                     }
                     return t;
 
@@ -128,7 +128,7 @@ public class TokenStream {
                         // DO NOT call readChar().
                     } else {
                         t.setValue(String.valueOf(currentChar));
-                        nextChar = readChar(); // Consume the character
+                        // No readChar() needed, character consumed before switch
                     }
                     return t;
                     
@@ -141,7 +141,7 @@ public class TokenStream {
                     } else {
                         t.setType("Other"); // Single =
                         t.setValue(String.valueOf(currentChar));
-                        nextChar = readChar(); // Consume the character
+                        // No readChar() needed, character consumed before switch
                     }
                     return t;
 
@@ -154,7 +154,7 @@ public class TokenStream {
                     } else {
                         t.setType("Other"); // Single :
                         t.setValue(String.valueOf(currentChar));
-                        nextChar = readChar(); // Consume the character
+                        // No readChar() needed, character consumed before switch
                     }
                     return t;
 
@@ -167,7 +167,7 @@ public class TokenStream {
                     } else {
                         t.setType("Other"); // Single |
                         t.setValue(String.valueOf(currentChar));
-                        nextChar = readChar(); // Consume the character
+                        // No readChar() needed, character consumed before switch
                     }
                     return t;
 
@@ -180,14 +180,14 @@ public class TokenStream {
                     } else {
                         t.setType("Other"); // Single &
                         t.setValue(String.valueOf(currentChar));
-                        nextChar = readChar(); // Consume the character
+                        // No readChar() needed, character consumed before switch
                     }
                     return t;
                 
                 default:
                     t.setType("Other");
                     t.setValue(String.valueOf(currentChar));
-                    nextChar = readChar(); // Consume the character
+                    // No readChar() needed, character consumed before switch
                     return t;
             }
         }
