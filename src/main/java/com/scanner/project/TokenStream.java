@@ -65,18 +65,22 @@ public class TokenStream {
             switch (currentChar) {
                 case '<':
                 case '>':
+                    nextChar = readChar();
+                    if (nextChar == '=') {
+                        t.setValue(t.getValue() + nextChar); 
+                        nextChar = readChar();
+                    }
+                    return t;
+
                 case '=':
                 case '!':
                     nextChar = readChar();
                     if (nextChar == '=') {
                         t.setValue(t.getValue() + nextChar); 
+                        t.setType("Operator"); // e.g., '==' or '!='
                         nextChar = readChar();
                     } else {
-                        // FIX: Single '=', '!', '<', '>' are Other (or Op).
-                        // '=' and '!' are Other. '<' and '>' are Op.
-                        if (currentChar == '=' || currentChar == '!') {
-                            t.setType("Other"); 
-                        }
+                        t.setType("Other"); // FIX: Single '=', '!' are 'Other'
                     }
                     return t;
 
@@ -106,7 +110,7 @@ public class TokenStream {
                         t.setValue(t.getValue() + nextChar); 
                         nextChar = readChar();
                     }
-                    // If single '*', it stays "Operator"
+                    // If single '*' or '**', it returns. '**' is correctly captured as one token.
                     return t;
                 
                 case ':':
@@ -143,20 +147,13 @@ public class TokenStream {
             
             String value = t.getValue();
 
-            // FIX: Check for case-sensitive Boolean Literals (True/False/true/false)
-            if (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false")) {
-                // If it matches a *case-sensitive* Literal (True, False), set type to Literal.
-                if (value.equals("true") || value.equals("false") || value.equals("True") || value.equals("False")) {
-                     t.setType("Literal");
-                }
+            // FIX: Corrected Logic based on failures (true/false are Identifiers, True/False are Literals)
+            if (value.equals("True") || value.equals("False")) {
+                 t.setType("Literal");
             } else if (isKeyword(value)) {
                 t.setType("Keyword");
             }
-            
-            // If the value is 'true' or 'false' but the test expects IDENTIFIER, 
-            // it means only the exact match (lowercase, not in test case) should be a Literal. 
-            // Since tests show 'true' and 'false' should be IDENTIFIERs, we rely on the
-            // case-sensitive checks in isKeyword (which are now gone) and rely on the Literal/Keyword list.
+            // If it's "true" or "false" (lowercase), it correctly stays "Identifier".
 
             return t; 
         }
@@ -172,7 +169,7 @@ public class TokenStream {
             return t;
         }
 
-        // 6. Final catch-all for single "Other" characters (period, etc.)
+        // 6. Final catch-all for single "Other" characters
         if (!isEof) {
             t.setValue(String.valueOf(nextChar));
             nextChar = readChar(); 
@@ -220,7 +217,6 @@ public class TokenStream {
             case "main":      
             case "integer":   
             case "bool":      
-                // FIX: Removed 'void' from keywords (it should be an Identifier)
                 return true;
             default:
                 return false;
@@ -242,7 +238,6 @@ public class TokenStream {
     }
 
     private boolean isSeparator(char c) {
-        // FIX: Removed '[' and ']' from Separator (tests show they are expected to be 'Other')
         return (c == '(' || c == ')' ||
                 c == '{' || c == '}' ||
                 c == ',' || c == ';');
