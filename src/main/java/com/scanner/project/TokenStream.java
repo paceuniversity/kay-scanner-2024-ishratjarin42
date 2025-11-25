@@ -73,11 +73,10 @@ public class TokenStream {
                 case '!':
                     nextChar = readChar();
                     if (nextChar == '=') {
-                        t.setValue(t.getValue() + nextChar); // e.g., '=='
+                        t.setValue(t.getValue() + nextChar); 
                         nextChar = readChar();
                     } else if (currentChar == '!' || currentChar == '=') {
-                         // Fix: Single '!' and '=' are 'Other' based on passing tests
-                         t.setType("Other"); 
+                         t.setType("Other"); // Fix: Single '!' and '=' are 'Other'
                     }
                     return t;
 
@@ -109,11 +108,10 @@ public class TokenStream {
                         t.setValue(t.getValue() + nextChar); // ** or :=
                         nextChar = readChar();
                     } else {
-                        // Fix: Single ':' is 'Other'
                         if (firstChar == ':') {
-                           t.setType("Other"); 
+                           t.setType("Other"); // Fix: Single ':' is 'Other'
                         }
-                        // Single '*' remains "Operator"
+                        // For '*', it remains "Operator"
                     }
                     return t;
 
@@ -138,13 +136,14 @@ public class TokenStream {
                 t.setValue(t.getValue() + nextChar);
                 nextChar = readChar();
             }
-
-            if (isKeyword(t.getValue())) {
-                t.setType("Keyword");
-            } else if (t.getValue().equals("true") || t.getValue().equals("false")) {
-                t.setType("Literal");
-            }
             
+            // Handle case sensitivity for boolean literals
+            if (t.getValue().equals("true") || t.getValue().equals("false")) {
+                t.setType("Literal");
+            } else if (isKeyword(t.getValue())) {
+                t.setType("Keyword");
+            }
+
             // FIX: Return immediately after processing token
             return t;
         }
@@ -161,7 +160,7 @@ public class TokenStream {
             return t;
         }
 
-        // Fallback for single "Other" characters (non-whitespace, non-operator, non-separator, non-start-of-identifier/literal)
+        // Final catch-all for single "Other" characters
         if (!isEof) {
             t.setValue(String.valueOf(nextChar));
             nextChar = readChar();
@@ -169,6 +168,7 @@ public class TokenStream {
             return t;
         }
 
+        // Should only be reached if EOF was missed or already passed
         return t;
     }
 
@@ -207,9 +207,9 @@ public class TokenStream {
             case "continue":
             case "class":
             case "new":
-            case "main":      // <-- ADDED FIX
-            case "integer":   // <-- ADDED FIX
-            case "bool":      // <-- ADDED FIX
+            case "main":      
+            case "integer":   
+            case "bool":      
                 return true;
             default:
                 return false;
@@ -225,7 +225,6 @@ public class TokenStream {
     }
 
     private boolean isEndOfToken(char c) {
-        // This is primarily used in comment/whitespace skipping, not core tokenization logic now
         return (isWhiteSpace(c) || isOperator(c) || isSeparator(c) || isEof);
     }
 
@@ -243,7 +242,6 @@ public class TokenStream {
     }
 
     private boolean isOperator(char c) {
-        // Includes all possible starting characters for operators
         return (c == '+' || c == '-' || c == '*' || c == '/' || c == '%' ||
                 c == '<' || c == '>' || c == '=' || c == '!' ||
                 c == '|' || c == '&' || c == '^' || c == '~' || c == ':');
