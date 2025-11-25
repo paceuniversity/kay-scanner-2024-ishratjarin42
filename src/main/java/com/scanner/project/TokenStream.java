@@ -83,7 +83,7 @@ public class TokenStream {
                     t.setType("Operator");
                     if (nextChar == '=') {
                         t.setValue(String.valueOf(currentChar) + nextChar); 
-                        nextChar = readChar(); // Consume the '=' (double advance)
+                        nextChar = readChar(); // Consume the '='
                     } else {
                         t.setValue(String.valueOf(currentChar));
                         // FIX: Must advance stream here if it was only a single operator.
@@ -96,7 +96,7 @@ public class TokenStream {
                     if (nextChar == '=' || nextChar == '|') {
                         t.setType("Operator");
                         t.setValue(String.valueOf(currentChar) + nextChar); 
-                        nextChar = readChar(); // Consume lookahead character (double advance)
+                        nextChar = readChar(); // Consume lookahead character
                     } else {
                         t.setType("Other"); // Single !
                         t.setValue(String.valueOf(currentChar));
@@ -124,7 +124,7 @@ public class TokenStream {
                     if (nextChar == '=') {
                         t.setType("Operator");
                         t.setValue("=="); 
-                        nextChar = readChar(); // Consume '=' (double advance)
+                        nextChar = readChar(); // Consume '='
                     } else {
                         t.setType("Other"); // Single =
                         t.setValue(String.valueOf(currentChar));
@@ -138,7 +138,7 @@ public class TokenStream {
                     if (nextChar == '=') {
                         t.setType("Operator");
                         t.setValue(":="); 
-                        nextChar = readChar(); // Consume '=' (double advance)
+                        nextChar = readChar(); // Consume '='
                     } else {
                         t.setType("Other"); // Single :
                         t.setValue(String.valueOf(currentChar));
@@ -152,7 +152,7 @@ public class TokenStream {
                     if (nextChar == '|') {
                         t.setType("Operator");
                         t.setValue("||");
-                        nextChar = readChar(); // Consume '|' (double advance)
+                        nextChar = readChar(); // Consume '|'
                     } else {
                         t.setType("Other"); // Single |
                         t.setValue(String.valueOf(currentChar));
@@ -166,7 +166,7 @@ public class TokenStream {
                     if (nextChar == '&') {
                         t.setType("Operator");
                         t.setValue("&&");
-                        nextChar = readChar(); // Consume '&' (double advance)
+                        nextChar = readChar(); // Consume '&'
                     } else {
                         t.setType("Other"); // Single &
                         t.setValue(String.valueOf(currentChar));
@@ -222,8 +222,7 @@ public class TokenStream {
             return t;
         }
         
-        // ** CRITICAL FIX FOR THE PERIOD/DOT **
-        // 6. Handle Period as Other 
+        // 6. Handle Period/Dot as Other - CRITICAL FIX
         if (nextChar == '.') {
             t.setType("Other");
             t.setValue(String.valueOf(nextChar));
