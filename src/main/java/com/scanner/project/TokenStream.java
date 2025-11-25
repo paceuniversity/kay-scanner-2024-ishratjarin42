@@ -34,6 +34,12 @@ public class TokenStream {
         t.setValue("");
 
         skipWhiteSpace();
+        
+        // Check for EOF first
+        if (isEof) {
+            t.setType("Eof");
+            return t;
+        }
 
         // Handle comments and division operator
         while (nextChar == '/') {
@@ -48,6 +54,7 @@ public class TokenStream {
                 }
                 skipWhiteSpace();
             } else {
+                // It's a single '/' operator
                 t.setType("Operator");
                 t.setValue("/");
                 return t;
@@ -58,43 +65,38 @@ public class TokenStream {
         if (isOperator(nextChar)) {
             t.setType("Operator");
             t.setValue(t.getValue() + nextChar);
+            char firstChar = nextChar;
+            nextChar = readChar(); // Advance to check for second character
 
-            switch (nextChar) {
-                case '<':
-                case '>':
-                case '=':
-                case '!':
-                    nextChar = readChar();
-                    if (nextChar == '=') {
-                        t.setValue(t.getValue() + nextChar);
-                        nextChar = readChar();
-                    }
-                    return t;
+            // Check for two-character operators
+            String twoCharOp = "" + firstChar + nextChar;
 
-                case '|':
-                    nextChar = readChar();
-                    if (nextChar == '|') {
-                        t.setValue(t.getValue() + nextChar);
-                        nextChar = readChar();
-                    } else {
-                        t.setType("Other");
-                    }
-                    return t;
-
-                case '&':
-                    nextChar = readChar();
-                    if (nextChar == '&') {
-                        t.setValue(t.getValue() + nextChar);
-                        nextChar = readChar();
-                    } else {
-                        t.setType("Other");
-                    }
-                    return t;
-
-                default:
-                    nextChar = readChar();
-                    return t;
+            if (twoCharOp.equals("==") || twoCharOp.equals("!=") || 
+                twoCharOp.equals("<=") || twoCharOp.equals(">=") ||
+                twoCharOp.equals("||") || twoCharOp.equals("&&") ||
+                twoCharOp.equals("**") || twoCharOp.equals(":=")) { // Added ** and :=
+                
+                t.setValue(twoCharOp);
+                nextChar = readChar(); // Advance past the second character
+                return t;
+            } 
+            // Handle single characters that START a two-character sequence, but are alone (e.g., '|' when '||' isn't next)
+            else if (firstChar == '|' || firstChar == '&' || firstChar == '!' || firstChar == ':') {
+                // Assuming these single symbols are "Other" or single operators if not followed by a second char
+                // The tests indicated '|', '&', and '!' alone might be "Other", so we set the type back
+                // We keep the value as the single character (t.getValue() already has the firstChar)
+                if (firstChar == '|' || firstChar == '&' || firstChar == '!') {
+                     t.setType("Other");
+                }
+                // If it's '+', '-', '*', etc., it remains "Operator" and we return it
+                
+                // nextChar is already advanced in the operator block, so we return
+                return t;
             }
+            
+            // Default: If it's a single-character operator (+, -, *, <, >, etc.)
+            // We already consumed the first character, so we return the token
+            return t;
         }
 
         // Separators
@@ -118,10 +120,9 @@ public class TokenStream {
             } else if (t.getValue().equals("true") || t.getValue().equals("false")) {
                 t.setType("Literal");
             }
-
-            if (isEndOfToken(nextChar)) {
-                return t;
-            }
+            
+            // FIX #1: Return immediately
+            return t;
         }
 
         // Integer Literal
@@ -132,23 +133,14 @@ public class TokenStream {
                 nextChar = readChar();
             }
 
-            if (isEndOfToken(nextChar)) {
-                return t;
-            }
-        }
-
-        t.setType("Other");
-
-        if (isEof) {
+            // FIX #2: Return immediately
             return t;
         }
 
-        while (!isEndOfToken(nextChar)) {
-            t.setValue(t.getValue() + nextChar);
-            nextChar = readChar();
-        }
-
-        skipWhiteSpace();
+        // Final catch-all for any single unhandled character as "Other"
+        t.setType("Other");
+        t.setValue(String.valueOf(nextChar));
+        nextChar = readChar();
         return t;
     }
 
@@ -187,6 +179,9 @@ public class TokenStream {
             case "continue":
             case "class":
             case "new":
+            case "main":      // <-- ADDED
+            case "integer":   // <-- ADDED
+            case "bool":      // <-- ADDED
                 return true;
             default:
                 return false;
@@ -219,6 +214,7 @@ public class TokenStream {
     }
 
     private boolean isOperator(char c) {
+        // Includes all possible starting characters for operators
         return (c == '+' || c == '-' || c == '*' || c == '/' || c == '%' ||
                 c == '<' || c == '>' || c == '=' || c == '!' ||
                 c == '|' || c == '&' || c == '^' || c == '~' || c == ':');
@@ -236,4 +232,3 @@ public class TokenStream {
         return isEof;
     }
 }
-
