@@ -60,72 +60,67 @@ public class TokenStream {
         if (isOperator(nextChar)) {
             t.setType("Operator");
             char currentChar = nextChar;
-            
-            // Handle multi-character operators first for lookahead
+            // IMPORTANT: Advance nextChar for lookahead
+            nextChar = readChar(); 
+
+            // Check for multi-character operators (This section has been restructured for clarity and precision)
             if (currentChar == '*') {
-                nextChar = readChar();
                 if (nextChar == '*') {
-                    t.setValue("**"); // Specifically for the doubleStarSymbol test
+                    t.setValue("**"); // Double star
                     nextChar = readChar();
                 } else {
-                    t.setValue(String.valueOf(currentChar));
+                    t.setValue("*");
                 }
                 return t;
             } else if (currentChar == '!') {
-                nextChar = readChar();
                 if (nextChar == '=' || nextChar == '|') { // Check for != and !|
                     t.setValue("!" + nextChar);
                     nextChar = readChar();
                 } else {
-                    t.setValue(String.valueOf(currentChar));
+                    t.setValue("!");
                     t.setType("Other"); // Single '!' is 'Other'
                 }
                 return t;
             } else if (currentChar == '=') {
-                 nextChar = readChar();
                 if (nextChar == '=') {
                     t.setValue("=="); 
                     nextChar = readChar();
                 } else {
-                    t.setValue(String.valueOf(currentChar));
+                    t.setValue("=");
                     t.setType("Other"); // Single '=' is 'Other'
                 }
                 return t;
             } else if (currentChar == ':') {
-                 nextChar = readChar();
                 if (nextChar == '=') {
                     t.setValue(":="); 
                     nextChar = readChar();
                 } else {
-                    t.setValue(String.valueOf(currentChar));
+                    t.setValue(":");
                     t.setType("Other"); // Single ':' is 'Other'
                 }
                 return t;
             } else if (currentChar == '|') {
-                nextChar = readChar();
                 if (nextChar == '|') {
                     t.setValue("||");
                     nextChar = readChar();
                 } else {
-                    t.setValue(String.valueOf(currentChar));
+                    t.setValue("|");
                     t.setType("Other"); // Single '|' is 'Other'
                 }
                 return t;
             } else if (currentChar == '&') {
-                nextChar = readChar();
                 if (nextChar == '&') {
                     t.setValue("&&");
                     nextChar = readChar();
                 } else {
-                    t.setValue(String.valueOf(currentChar));
+                    t.setValue("&");
                     t.setType("Other"); // Single '&' is 'Other'
                 }
                 return t;
             } else if (currentChar == '<' || currentChar == '>') {
                 // Single/Double < and > operators
-                nextChar = readChar();
                 if (nextChar == '=') {
-                    t.setValue(String.valueOf(currentChar) + nextChar); 
+                    t.setValue(String.valueOf(currentChar) + "="); 
                     nextChar = readChar();
                 } else {
                     t.setValue(String.valueOf(currentChar));
@@ -133,9 +128,9 @@ public class TokenStream {
                 return t;
             }
             
-            // Default for single-character operators (+, -, %, ^, ~)
+            // Default for remaining single-character operators (+, -, %, ^, ~)
             t.setValue(String.valueOf(currentChar));
-            nextChar = readChar();
+            // nextChar was already advanced at the start of the block
             return t;
         }
 
@@ -157,12 +152,13 @@ public class TokenStream {
             
             String value = t.getValue();
 
+            // Logic: True/False are Literals. All keywords are Keywords. All others (including true/false) are Identifiers.
             if (value.equals("True") || value.equals("False")) {
                  t.setType("Literal");
             } else if (isKeyword(value)) {
                 t.setType("Keyword");
             }
-            // All other valid identifier combinations (like Xy1, true, false) remain Identifier.
+            
             return t; 
         }
 
@@ -269,4 +265,5 @@ public class TokenStream {
         return isEof;
     }
 }
+
 
