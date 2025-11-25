@@ -83,34 +83,30 @@ public class TokenStream {
                 return t;
             } 
             
-            // For all other operators, perform single lookahead for one- or two-character tokens
-            nextChar = readChar(); // Consume the currentChar
-            t.setValue(String.valueOf(currentChar));
+            // For all other operators, perform single lookahead for two-character tokens
+            nextChar = readChar(); // Consume the currentChar and look ahead
 
-            if (currentChar == '=' || currentChar == '|' || currentChar == '&' || currentChar == ':' || currentChar == '<' || currentChar == '>') {
-                
-                // Check for secondary character in operators like ==, ||, &&, :=, <=, >=
-                if (currentChar == nextChar) { 
-                    // This handles ==, ||, &&
-                    t.setValue(t.getValue() + nextChar);
-                    nextChar = readChar();
-                } else if ((currentChar == '<' || currentChar == '>') && nextChar == '=') { 
-                    // This handles <= and >=
-                    t.setValue(t.getValue() + nextChar);
-                    nextChar = readChar();
-                } else if (currentChar == ':' && nextChar == '=') { 
-                    // This handles :=
-                    t.setValue(t.getValue() + nextChar);
-                    nextChar = readChar();
-                }
+            // Check for multi-character tokens
+            if (currentChar == '=' && nextChar == '=') {
+                t.setValue("=="); nextChar = readChar(); return t;
+            } else if (currentChar == '|' && nextChar == '|') {
+                t.setValue("||"); nextChar = readChar(); return t;
+            } else if (currentChar == '&' && nextChar == '&') {
+                t.setValue("&&"); nextChar = readChar(); return t;
+            } else if (currentChar == ':' && nextChar == '=') {
+                t.setValue(":="); nextChar = readChar(); return t;
+            } else if ((currentChar == '<' || currentChar == '>') && nextChar == '=') {
+                t.setValue(String.valueOf(currentChar) + "="); nextChar = readChar(); return t;
             }
+            
+            // Default: It is a single-character operator (or other single symbol)
+            t.setValue(String.valueOf(currentChar));
             
             // Final type assignment for single characters which are 'Other'
             if (t.getValue().equals("=") || t.getValue().equals("|") || t.getValue().equals("&") || t.getValue().equals(":")) {
                  t.setType("Other");
             }
-            
-            // Operators like +, -, %, ^, ~ are caught here as 'Operator'
+            // All others (+, -, %, ^, ~, <, >) remain Operator
             return t;
         }
 
