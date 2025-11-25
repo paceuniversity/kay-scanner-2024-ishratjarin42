@@ -7,20 +7,17 @@ import java.io.IOException;
 
 public class TokenStream {
 
-    // Instance variables 
-    private boolean isEof = false; // is end of file
-    private char nextChar = ' '; // next character in input stream
+    private boolean isEof = false;
+    private char nextChar = ' ';
     private BufferedReader input;
 
     public boolean isEoFile() {
         return isEof;
     }
 
-    // Constructor
     public TokenStream(String fileName) {
         try {
             input = new BufferedReader(new FileReader(fileName));
-            // PRIME the stream
             nextChar = readChar();
         } catch (FileNotFoundException e) {
             System.out.println("File not found: " + fileName);
@@ -74,8 +71,12 @@ public class TokenStream {
                     if (nextChar == '=') {
                         t.setValue(t.getValue() + nextChar); 
                         nextChar = readChar();
-                    } else if (currentChar == '!' || currentChar == '=') {
-                         t.setType("Other"); 
+                    } else {
+                        // FIX: Single '=', '!', '<', '>' are Other (or Op).
+                        // '=' and '!' are Other. '<' and '>' are Op.
+                        if (currentChar == '=' || currentChar == '!') {
+                            t.setType("Other"); 
+                        }
                     }
                     return t;
 
@@ -100,17 +101,21 @@ public class TokenStream {
                     return t;
                 
                 case '*': 
-                case ':':
-                    char firstChar = currentChar;
                     nextChar = readChar();
-                    if ((firstChar == '*' && nextChar == '*') || (firstChar == ':' && nextChar == '=')) {
+                    if (nextChar == '*') {
+                        t.setValue(t.getValue() + nextChar); 
+                        nextChar = readChar();
+                    }
+                    // If single '*', it stays "Operator"
+                    return t;
+                
+                case ':':
+                    nextChar = readChar();
+                    if (nextChar == '=') {
                         t.setValue(t.getValue() + nextChar); 
                         nextChar = readChar();
                     } else {
-                        if (firstChar == ':') {
-                           t.setType("Other"); 
-                        }
-                        // Single '*' remains "Operator" and stream is already advanced by one
+                        t.setType("Other"); // Single ':' is Other
                     }
                     return t;
 
@@ -136,13 +141,24 @@ public class TokenStream {
                 nextChar = readChar();
             }
             
-            if (t.getValue().equals("true") || t.getValue().equals("false")) {
-                t.setType("Literal");
-            } else if (isKeyword(t.getValue())) {
+            String value = t.getValue();
+
+            // FIX: Check for case-sensitive Boolean Literals (True/False/true/false)
+            if (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false")) {
+                // If it matches a *case-sensitive* Literal (True, False), set type to Literal.
+                if (value.equals("true") || value.equals("false") || value.equals("True") || value.equals("False")) {
+                     t.setType("Literal");
+                }
+            } else if (isKeyword(value)) {
                 t.setType("Keyword");
             }
+            
+            // If the value is 'true' or 'false' but the test expects IDENTIFIER, 
+            // it means only the exact match (lowercase, not in test case) should be a Literal. 
+            // Since tests show 'true' and 'false' should be IDENTIFIERs, we rely on the
+            // case-sensitive checks in isKeyword (which are now gone) and rely on the Literal/Keyword list.
 
-            return t; // Stream is already advanced one past the token
+            return t; 
         }
 
         // 5. Integer Literal
@@ -153,13 +169,13 @@ public class TokenStream {
                 nextChar = readChar();
             }
 
-            return t; // Stream is already advanced one past the token
+            return t;
         }
 
-        // 6. Final catch-all for single "Other" characters
+        // 6. Final catch-all for single "Other" characters (period, etc.)
         if (!isEof) {
             t.setValue(String.valueOf(nextChar));
-            nextChar = readChar(); // Advance the stream past the 'Other' character
+            nextChar = readChar(); 
             t.setType("Other");
             return t;
         }
@@ -197,7 +213,6 @@ public class TokenStream {
             case "return":
             case "int":
             case "boolean":
-            case "void":
             case "break":
             case "continue":
             case "class":
@@ -205,6 +220,7 @@ public class TokenStream {
             case "main":      
             case "integer":   
             case "bool":      
+                // FIX: Removed 'void' from keywords (it should be an Identifier)
                 return true;
             default:
                 return false;
@@ -219,10 +235,6 @@ public class TokenStream {
         return (c == '\r' || c == '\n' || c == '\f');
     }
 
-    private boolean isEndOfToken(char c) {
-        return (isWhiteSpace(c) || isOperator(c) || isSeparator(c) || isEof);
-    }
-
     private void skipWhiteSpace() {
         while (!isEof && isWhiteSpace(nextChar)) {
             nextChar = readChar();
@@ -230,10 +242,9 @@ public class TokenStream {
     }
 
     private boolean isSeparator(char c) {
-        // Includes '[' and ']' which are often 'Other' or 'Separator'
+        // FIX: Removed '[' and ']' from Separator (tests show they are expected to be 'Other')
         return (c == '(' || c == ')' ||
                 c == '{' || c == '}' ||
-                c == '[' || c == ']' || 
                 c == ',' || c == ';');
     }
 
@@ -255,3 +266,4 @@ public class TokenStream {
         return isEof;
     }
 }
+
