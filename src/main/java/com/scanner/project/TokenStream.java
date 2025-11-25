@@ -1,266 +1,324 @@
-Run classroom-resources/autograding-command-grader@v1
-  with:
-    test-name: Scanner Test
-    command: gradle test
-    timeout: 10
-
-Welcome to Gradle 9.2.0!
-
-Here are the highlights of this release:
- - Windows ARM support
- - Improved publishing APIs
- - Better guidance for dependency verification failures
-
-For more details see https://docs.gradle.org/9.2.0/release-notes.html
-
-Starting a Gradle Daemon (subsequent builds will be faster)
-> Task :compileJava
-> Task :processResources NO-SOURCE
-> Task :classes
-> Task :compileTestJava
-> Task :processTestResources
-> Task :testClasses
-
-> Task :test FAILED
-
-ScannerTest > num22IsLiteral() PASSED
-
-ScannerTest > slashIsOther() PASSED
-
-ScannerTest > multiplicationSignIsOperator() PASSED
-
-ScannerTest > secretTest1() FAILED
-    org.opentest4j.AssertionFailedError at ScannerTest.java:630
-
-ScannerTest > secretTest2() PASSED
-
-ScannerTest > secretTest3() FAILED
-    org.opentest4j.AssertionFailedError at ScannerTest.java:648
-
-ScannerTest > secretTest4() PASSED
-
-ScannerTest > secretTest5() FAILED
-    org.opentest4j.AssertionFailedError at ScannerTest.java:664
-
-ScannerTest > secretTest6() FAILED
-    org.opentest4j.AssertionFailedError at ScannerTest.java:673
-
-ScannerTest > secretTest7() PASSED
-
-ScannerTest > secretTest8() PASSED
-
-ScannerTest > secretTest9() FAILED
-    org.opentest4j.AssertionFailedError at ScannerTest.java:701
-
-ScannerTest > num1IsLiteral() PASSED
-
-ScannerTest > leftSquareBracketSymbolIsOther() PASSED
-
-ScannerTest > aIsIdentifier() PASSED
-
-ScannerTest > ifIsKeyword() PASSED
-
-ScannerTest > num21IsLiteral() PASSED
-
-ScannerTest > num0IsLiteral() PASSED
-
-ScannerTest > num20IsLiteral() PASSED
-
-ScannerTest > num19IsLiteral() PASSED
-
-ScannerTest > minusSignIsOperator() PASSED
-
-ScannerTest > num256IsLiteral() PASSED
-
-ScannerTest > num18IsLiteral() PASSED
-
-ScannerTest > mainIsKeyword() PASSED
-
-ScannerTest > exclamationPointEqualsSignIsOperator() PASSED
-
-ScannerTest > ampersandIsOther() PASSED
-
-ScannerTest > num54932IsLiteral() PASSED
-
-ScannerTest > num5823943294892IsLiteral() PASSED
-
-ScannerTest > num17IsLiteral() PASSED
-
-ScannerTest > doubleAmpersandIsOperator() PASSED
-
-ScannerTest > doubleStarSymbolIsOperatorOperator() PASSED
-
-ScannerTest > trueIsIdentifier() PASSED
-
-ScannerTest > num5838323IsLiteral() PASSED
-
-ScannerTest > num16IsLiteral() PASSED
-
-ScannerTest > equalsSignIsOther() PASSED
-
-ScannerTest > elseIsKeyword() PASSED
-
-ScannerTest > counterIsIdentifier() PASSED
-
-ScannerTest > doubleEqualsSignIsOperator() PASSED
-
-ScannerTest > plusSignIsOperator() PASSED
-
-ScannerTest > num15IsLiteral() PASSED
-
-ScannerTest > lessThanSignIsOperator() PASSED
-
-ScannerTest > doIsIdentifier() PASSED
-
-ScannerTest > num14IsLiteral() PASSED
-
-ScannerTest > num342894252085IsLiteral() PASSED
-
-ScannerTest > colonEqualsSignIsOperator() PASSED
-
-ScannerTest > num13IsLiteral() PASSED
-
-ScannerTest > commaIsSeparator() PASSED
-
-ScannerTest > greaterThanSignEqualsSignIsOperator() PASSED
-
-ScannerTest > voidIsIdentifier() PASSED
-
-ScannerTest > num12IsLiteral() PASSED
-
-ScannerTest > divisionSignIsOperator() PASSED
-
-ScannerTest > num100IsLiteral() PASSED
-
-ScannerTest > num1doubleEqualsSignNum2IsLiteralOperatorLiteral() PASSED
-
-ScannerTest > num11IsLiteral() PASSED
-
-ScannerTest > xIsIdentifier() PASSED
-
-ScannerTest > greaterThanSignIsOperator() PASSED
-
-ScannerTest > num393920582IsLiteral() PASSED
-
-ScannerTest > num10IsLiteral() PASSED
-
-ScannerTest > FalseIsLiteral() PASSED
-
-ScannerTest > num595686866830384IsLiteral() PASSED
-
-ScannerTest > leftBracketIsSeparator() PASSED
-
-ScannerTest > pipeSymbolIsOther() PASSED
-
-ScannerTest > rightSquareBracketIsOther() PASSED
-
-ScannerTest > num44820105839845032IsLiteral() PASSED
-
-ScannerTest > aaIsIdentifier() PASSED
-
-ScannerTest > num9IsLiteral() PASSED
-
-ScannerTest > num30IsLiteral() PASSED
-
-ScannerTest > num58834324234IsLiteral() PASSED
-
-ScannerTest > num29IsLiteral() PASSED
-
-ScannerTest > num8IsLiteral() PASSED
-
-ScannerTest > num6594IsLiteral() PASSED
-
-ScannerTest > num28IsLiteral() PASSED
-
-ScannerTest > secretTest10() FAILED
-    org.opentest4j.AssertionFailedError at ScannerTest.java:708
-
-ScannerTest > TRUEIsIdentifier() PASSED
-
-ScannerTest > semicolonIsSeparator() PASSED
-
-ScannerTest > falseIsIdentifier() PASSED
-
-109 tests completed, 10 failed
-
-ScannerTest > doubleVerticalBarIsOperator() PASSED
-
-ScannerTest > num543922IsLiteral() PASSED
-
-ScannerTest > num7IsLiteral() PASSED
-
-ScannerTest > a3IsIdentifier() PASSED
-
-ScannerTest > num27IsLiteral() PASSED
-
-ScannerTest > num432205294320580285IsLiteral() PASSED
-
-ScannerTest > num6IsLiteral() PASSED
-
-ScannerTest > exclamationPointBarIsOperator() FAILED
-    org.opentest4j.AssertionFailedError at ScannerTest.java:104
-
-ScannerTest > num26IsLiteral() PASSED
-
-ScannerTest > X3IsIdentifier() PASSED
-
-ScannerTest > capitalXLowercaseYNum1IsIdentifier() FAILED
-    org.opentest4j.AssertionFailedError at ScannerTest.java:617
-
-ScannerTest > integerIsKeyword() PASSED
-
-ScannerTest > num5IsLiteral() PASSED
-
-ScannerTest > num48329483248322IsLiteral() PASSED
-
-ScannerTest > num25IsLiteral() PASSED
-
-ScannerTest > num2PeriodNum5IsOtherLiteral() FAILED
-    org.opentest4j.AssertionFailedError at ScannerTest.java:611
-
-ScannerTest > whileIsKeyword() PASSED
-
-ScannerTest > colonIsOther() PASSED
-
-ScannerTest > num4IsLiteral() PASSED
-
-ScannerTest > num4823980580280508IsLiteral() PASSED
-
-ScannerTest > boolIsKeyword() PASSED
-
-ScannerTest > num4894309432IsLiteral() PASSED
-
-ScannerTest > num85403345IsLiteral() PASSED
-
-ScannerTest > num24IsLiteral() PASSED
-
-ScannerTest > num3IsLiteral() PASSED
-
-ScannerTest > negativeSignNum5IsOperatorLiteral() FAILED
-    org.opentest4j.AssertionFailedError at ScannerTest.java:623
-
-ScannerTest > rightBracketIsSeparator() PASSED
-
-ScannerTest > num23IsLiteral() PASSED
-
-ScannerTest > lessThanSignEqualsSignIsOperator() PASSED
-
-ScannerTest > rightParenthesisIsSeparator() PASSED
-
-ScannerTest > num2IsLiteral() PASSED
-
-ScannerTest > atSignIsOther() PASSED
-
-ScannerTest > TrueIsLiteral() PASSED
-
-FAILURE: Build failed with an exception.
-
-* What went wrong:
-Execution failed for task ':test'.
-> There were failing tests. See the report at: file:///home/runner/work/kay-scanner-2024-ishratjarin42/kay-scanner-2024-ishratjarin42/build/reports/tests/test/index.html
-
-* Try:
-> Run with --scan to generate a Build Scan (powered by Develocity).
-
-BUILD FAILED in 34s
-4 actionable tasks: 4 executed
+package com.scanner.project;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+
+public class TokenStream {
+
+    private boolean isEof = false;
+    private char nextChar = ' ';
+    private BufferedReader input;
+
+    public boolean isEoFile() {
+        return isEof;
+    }
+
+    public TokenStream(String fileName) {
+        try {
+            input = new BufferedReader(new FileReader(fileName));
+            nextChar = readChar();
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found: " + fileName);
+            isEof = true;
+        }
+    }
+
+    public Token nextToken() {
+        Token t = new Token();
+        t.setType("Other");
+        t.setValue("");
+
+        skipWhiteSpace();
+        
+        if (isEof) {
+            t.setType("Eof");
+            return t;
+        }
+
+        // 1. Handle comments and division operator
+        while (nextChar == '/') {
+            char tempChar = nextChar;
+            nextChar = readChar();
+            if (nextChar == '/') {
+                // Skip comment until end of line
+                while (!isEof && !isEndOfLine(nextChar)) {
+                    nextChar = readChar();
+                }
+                if (!isEof) {
+                    nextChar = readChar();
+                }
+                skipWhiteSpace();
+            } else {
+                // Single '/' is Division Operator
+                t.setType("Operator");
+                t.setValue(String.valueOf(tempChar));
+                return t;
+            }
+        }
+        
+        // 2. Separators
+        if (isSeparator(nextChar)) {
+            t.setType("Separator");
+            t.setValue(String.valueOf(nextChar));
+            nextChar = readChar();
+            return t;
+        }
+
+        // 3. Explicit Single-Character Other Tokens (CRITICAL FIX FOR [ ] @ . )
+        if (nextChar == '[' || nextChar == ']' || nextChar == '@' || nextChar == '.') {
+            t.setType("Other");
+            t.setValue(String.valueOf(nextChar));
+            nextChar = readChar();
+            return t;
+        }
+        
+        // 4. Operators / Others (Handled via lookahead in switch)
+        if (isOperator(nextChar)) {
+            char currentChar = nextChar;
+            
+            // Advance nextChar for the lookahead before the switch starts (Standard approach)
+            nextChar = readChar(); 
+
+            switch (currentChar) {
+                case '+':
+                case '-':
+                case '%':
+                case '^':
+                case '~':
+                    // These are always single-character Operators.
+                    t.setType("Operator");
+                    t.setValue(String.valueOf(currentChar));
+                    // CRITICAL FIX: Advance stream to consume the character.
+                    nextChar = readChar(); 
+                    return t;
+                    
+                case '<':
+                case '>':
+                    t.setType("Operator");
+                    if (nextChar == '=') {
+                        t.setValue(String.valueOf(currentChar) + nextChar); 
+                        nextChar = readChar(); // Consume the '='
+                    } else {
+                        t.setValue(String.valueOf(currentChar));
+                        // FIX: Must advance stream here if it was only a single operator.
+                        nextChar = readChar();
+                    }
+                    return t;
+
+                case '!':
+                    // ! is Other, != and !| are Operator
+                    if (nextChar == '=' || nextChar == '|') {
+                        t.setType("Operator");
+                        t.setValue(String.valueOf(currentChar) + nextChar); 
+                        nextChar = readChar(); // Consume lookahead character
+                    } else {
+                        t.setType("Other"); // Single !
+                        t.setValue(String.valueOf(currentChar));
+                        // FIX: Must advance stream here if it was only a single '!'
+                        nextChar = readChar();
+                    }
+                    return t;
+
+                case '*': 
+                    // Fix for doubleStarSymbolIsOperatorOperator() test: Treat ** as two separate tokens.
+                    t.setType("Operator");
+                    if (nextChar == '*') {
+                        t.setValue(String.valueOf(currentChar)); // Return the first *
+                        // nextChar still holds the second '*', ready for the next nextToken() call.
+                        // DO NOT call readChar().
+                    } else {
+                        t.setValue(String.valueOf(currentChar));
+                        // FIX: Must advance stream here if it was only a single '*'
+                        nextChar = readChar();
+                    }
+                    return t;
+                    
+                case '=':
+                    // = is Other, == is Operator
+                    if (nextChar == '=') {
+                        t.setType("Operator");
+                        t.setValue("=="); 
+                        nextChar = readChar(); // Consume '='
+                    } else {
+                        t.setType("Other"); // Single =
+                        t.setValue(String.valueOf(currentChar));
+                        // FIX: Must advance stream here if it was only a single '='
+                        nextChar = readChar();
+                    }
+                    return t;
+
+                case ':':
+                    // : is Other, := is Operator
+                    if (nextChar == '=') {
+                        t.setType("Operator");
+                        t.setValue(":="); 
+                        nextChar = readChar(); // Consume '='
+                    } else {
+                        t.setType("Other"); // Single :
+                        t.setValue(String.valueOf(currentChar));
+                        // FIX: Must advance stream here if it was only a single ':'
+                        nextChar = readChar();
+                    }
+                    return t;
+
+                case '|':
+                    // | is Other, || is Operator
+                    if (nextChar == '|') {
+                        t.setType("Operator");
+                        t.setValue("||");
+                        nextChar = readChar(); // Consume '|'
+                    } else {
+                        t.setType("Other"); // Single |
+                        t.setValue(String.valueOf(currentChar));
+                        // FIX: Must advance stream here if it was only a single '|'
+                        nextChar = readChar();
+                    }
+                    return t;
+
+                case '&':
+                    // & is Other, && is Operator
+                    if (nextChar == '&') {
+                        t.setType("Operator");
+                        t.setValue("&&");
+                        nextChar = readChar(); // Consume '&'
+                    } else {
+                        t.setType("Other"); // Single &
+                        t.setValue(String.valueOf(currentChar));
+                        // FIX: Must advance stream here if it was only a single '&'
+                        nextChar = readChar();
+                    }
+                    return t;
+                
+                default:
+                    t.setType("Other");
+                    t.setValue(String.valueOf(currentChar));
+                    // FIX: Must advance stream here if it hit the default case.
+                    nextChar = readChar();
+                    return t;
+            }
+        }
+
+        // 5. Identifier / Keyword / Boolean Literal
+        if (isLetter(nextChar)) {
+            t.setType("Identifier");
+            while (isLetter(nextChar) || isDigit(nextChar)) {
+                t.setValue(t.getValue() + nextChar);
+                nextChar = readChar();
+            }
+            
+            String value = t.getValue();
+
+            if (value.equals("True") || value.equals("False")) {
+                 t.setType("Literal");
+            } else if (isKeyword(value)) {
+                t.setType("Keyword");
+            }
+            
+            return t; 
+        }
+
+        // 6. Integer Literal
+        if (isDigit(nextChar)) {
+            t.setType("Literal");
+            while (isDigit(nextChar)) {
+                t.setValue(t.getValue() + nextChar);
+                nextChar = readChar();
+            }
+
+            return t;
+        }
+
+        // 7. Final catch-all for single "Other" characters
+        if (!isEof) {
+            t.setValue(String.valueOf(nextChar));
+            nextChar = readChar(); 
+            t.setType("Other");
+            return t;
+        }
+
+        return t;
+    }
+
+    private char readChar() {
+        int i = 0;
+        if (isEof)
+            return (char) 0;
+
+        try {
+            i = input.read();
+        } catch (IOException e) {
+            System.exit(-1);
+        }
+
+        if (i == -1) {
+            isEof = true;
+            return (char) 0;
+        }
+        return (char) i;
+    }
+
+    // ================= HELPER METHODS =================
+
+    private boolean isKeyword(String s) {
+        if (s == null) return false;
+        switch (s) {
+            case "if":
+            case "else":
+            case "while":
+            case "for":
+            case "return":
+            case "int":
+            case "boolean":
+            case "break":
+            case "continue":
+            case "class":
+            case "new":
+            case "main":      
+            case "integer":   
+            case "bool":      
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private boolean isWhiteSpace(char c) {
+        return (c == ' ' || c == '\t' || c == '\r' || c == '\n' || c == '\f');
+    }
+
+    private boolean isEndOfLine(char c) {
+        return (c == '\r' || c == '\n' || c == '\f');
+    }
+
+    private void skipWhiteSpace() {
+        while (!isEof && isWhiteSpace(nextChar)) {
+            nextChar = readChar();
+        }
+    }
+
+    private boolean isSeparator(char c) {
+        return (c == '(' || c == ')' ||
+                c == '{' || c == '}' ||
+                c == ',' || c == ';');
+    }
+
+    private boolean isOperator(char c) {
+        return (c == '+' || c == '-' || c == '*' || c == '/' || c == '%' ||
+                c == '<' || c == '>' || c == '=' || c == '!' ||
+                c == '|' || c == '&' || c == '^' || c == '~' || c == ':');
+    }
+
+    private boolean isLetter(char c) {
+        return (c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z');
+    }
+
+    private boolean isDigit(char c) {
+        return (c >= '0' && c <= '9');
+    }
+
+    public boolean isEndofFile() {
+        return isEof;
+    }
+}
