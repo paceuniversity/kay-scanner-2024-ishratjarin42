@@ -71,11 +71,10 @@ public class TokenStream {
                 case '%':
                 case '^':
                 case '~':
-                    // These are always single-character Operators.
+                    // These are always single-character Operators. nextChar already holds the next token.
                     t.setType("Operator");
                     t.setValue(String.valueOf(currentChar));
-                    // CRITICAL FIX: Advance the stream to consume the character we just processed.
-                    nextChar = readChar(); 
+                    // NO stream advance here. The initial advance before the switch consumed currentChar.
                     return t;
                     
                 case '<':
@@ -83,9 +82,10 @@ public class TokenStream {
                     t.setType("Operator");
                     if (nextChar == '=') {
                         t.setValue(String.valueOf(currentChar) + nextChar); 
-                        nextChar = readChar(); // Advance again to consume '='
+                        nextChar = readChar(); // Consume the '='
                     } else {
                         t.setValue(String.valueOf(currentChar));
+                        // NO stream advance here.
                     }
                     return t;
 
@@ -94,21 +94,24 @@ public class TokenStream {
                     if (nextChar == '=' || nextChar == '|') {
                         t.setType("Operator");
                         t.setValue(String.valueOf(currentChar) + nextChar); 
-                        nextChar = readChar(); // Advance again to consume lookahead
+                        nextChar = readChar(); // Consume lookahead character
                     } else {
                         t.setType("Other"); // Single !
                         t.setValue(String.valueOf(currentChar));
+                        // NO stream advance here.
                     }
                     return t;
 
                 case '*': 
-                    // * and ** are Operator
+                    // CRITICAL FIX for doubleStarSymbolIsOperatorOperator() test: Treat ** as two separate tokens.
                     t.setType("Operator");
                     if (nextChar == '*') {
-                        t.setValue("**"); 
-                        nextChar = readChar(); // Advance again to consume second '*'
+                        t.setValue(String.valueOf(currentChar)); // Return the first *
+                        // nextChar still holds the second '*', ready for the next nextToken() call.
+                        // We DO NOT call readChar() here.
                     } else {
                         t.setValue(String.valueOf(currentChar));
+                        // NO stream advance here.
                     }
                     return t;
                     
@@ -117,10 +120,11 @@ public class TokenStream {
                     if (nextChar == '=') {
                         t.setType("Operator");
                         t.setValue("=="); 
-                        nextChar = readChar(); // Advance again to consume '='
+                        nextChar = readChar(); // Consume '='
                     } else {
                         t.setType("Other"); // Single =
                         t.setValue(String.valueOf(currentChar));
+                        // NO stream advance here.
                     }
                     return t;
 
@@ -129,10 +133,11 @@ public class TokenStream {
                     if (nextChar == '=') {
                         t.setType("Operator");
                         t.setValue(":="); 
-                        nextChar = readChar(); // Advance again to consume '='
+                        nextChar = readChar(); // Consume '='
                     } else {
                         t.setType("Other"); // Single :
                         t.setValue(String.valueOf(currentChar));
+                        // NO stream advance here.
                     }
                     return t;
 
@@ -141,10 +146,11 @@ public class TokenStream {
                     if (nextChar == '|') {
                         t.setType("Operator");
                         t.setValue("||");
-                        nextChar = readChar(); // Advance again to consume '|'
+                        nextChar = readChar(); // Consume '|'
                     } else {
                         t.setType("Other"); // Single |
                         t.setValue(String.valueOf(currentChar));
+                        // NO stream advance here.
                     }
                     return t;
 
@@ -153,15 +159,15 @@ public class TokenStream {
                     if (nextChar == '&') {
                         t.setType("Operator");
                         t.setValue("&&");
-                        nextChar = readChar(); // Advance again to consume '&'
+                        nextChar = readChar(); // Consume '&'
                     } else {
                         t.setType("Other"); // Single &
                         t.setValue(String.valueOf(currentChar));
+                        // NO stream advance here.
                     }
                     return t;
                 
                 default:
-                    // Fallback, should not be reached
                     t.setType("Other");
                     t.setValue(String.valueOf(currentChar));
                     return t;
