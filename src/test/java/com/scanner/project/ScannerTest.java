@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 public class ScannerTest {
 
-    private static final String file1 = "src/test/java/com/scanner/project/test.kay";
+    private static final String file1 = "src/test/resources/test.kay";
 
     /*
      * sets the TokenStream to the correct line of the input file
