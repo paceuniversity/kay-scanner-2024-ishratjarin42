@@ -222,15 +222,7 @@ public class TokenStream {
             return t;
         }
         
-        // 6. Handle Period/Dot as Other - CRITICAL FIX
-        if (nextChar == '.') {
-            t.setType("Other");
-            t.setValue(String.valueOf(nextChar));
-            nextChar = readChar();
-            return t;
-        }
-
-        // 7. Final catch-all for single "Other" characters
+        // 6. Final catch-all for single "Other" characters (This handles the dot/period)
         if (!isEof) {
             t.setValue(String.valueOf(nextChar));
             nextChar = readChar(); 
