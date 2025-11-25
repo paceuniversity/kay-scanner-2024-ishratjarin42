@@ -71,9 +71,11 @@ public class TokenStream {
                 case '%':
                 case '^':
                 case '~':
-                    // These are always single-character Operators. nextChar already advanced once.
+                    // These are always single-character Operators.
                     t.setType("Operator");
                     t.setValue(String.valueOf(currentChar));
+                    // CRITICAL FIX: Advance the stream to consume the character we just processed.
+                    nextChar = readChar(); 
                     return t;
                     
                 case '<':
