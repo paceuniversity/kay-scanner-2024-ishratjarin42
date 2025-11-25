@@ -74,7 +74,7 @@ public class TokenStream {
                     // These are always single-character Operators. nextChar already holds the next token.
                     t.setType("Operator");
                     t.setValue(String.valueOf(currentChar));
-                    // NO stream advance here. The initial advance before the switch consumed currentChar.
+                    // NO stream advance here.
                     return t;
                     
                 case '<':
@@ -108,7 +108,7 @@ public class TokenStream {
                     if (nextChar == '*') {
                         t.setValue(String.valueOf(currentChar)); // Return the first *
                         // nextChar still holds the second '*', ready for the next nextToken() call.
-                        // We DO NOT call readChar() here.
+                        // DO NOT call readChar().
                     } else {
                         t.setValue(String.valueOf(currentChar));
                         // NO stream advance here.
