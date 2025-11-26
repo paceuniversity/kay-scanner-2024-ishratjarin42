@@ -66,7 +66,7 @@ public class TokenStream {
             return t;
         }
 
-        // 3. Explicit Single-Character Other Tokens (FIX: Adding '.' explicitly here)
+        // 3. Explicit Single-Character Other Tokens (Handles [ ] @ .)
         if (nextChar == '[' || nextChar == ']' || nextChar == '@' || nextChar == '.') {
             t.setType("Other");
             t.setValue(String.valueOf(nextChar));
@@ -74,26 +74,23 @@ public class TokenStream {
             return t;
         }
         
-        // 4. Operators / Others (Handled via lookahead in switch)
-        if (isOperator(nextChar)) {
+        // 3.5. Guaranteed Single-Character Operators (FIX FOR -5 ISSUE)
+        // These tokens DO NOT have a double-character form, so they should use the simple consume pattern.
+        if (nextChar == '+' || nextChar == '-' || nextChar == '%' || nextChar == '^' || nextChar == '~') {
+            t.setType("Operator");
+            t.setValue(String.valueOf(nextChar));
+            nextChar = readChar();
+            return t;
+        }
+
+        // 4. Lookahead Operators / Others (Only tokens that can be 1 or 2 chars, or have complex single-char rules)
+        if (isLookaheadOperator(nextChar)) {
             char currentChar = nextChar;
             
             // Advance nextChar for the lookahead before the switch starts (Standard approach)
             nextChar = readChar(); 
 
             switch (currentChar) {
-                case '+':
-                case '-':
-                case '%':
-                case '^':
-                case '~':
-                    // These are always single-character Operators.
-                    t.setType("Operator");
-                    t.setValue(String.valueOf(currentChar));
-                    // REVERTED: Re-introducing the readChar() for stream stability
-                    nextChar = readChar(); 
-                    return t; 
-                    
                 case '<':
                 case '>':
                     t.setType("Operator");
@@ -102,7 +99,7 @@ public class TokenStream {
                         nextChar = readChar(); // Consume the '='
                     } else {
                         t.setValue(String.valueOf(currentChar));
-                        nextChar = readChar(); // Consume the character
+                        // nextChar holds the lookahead, correct for next token
                     }
                     return t;
 
@@ -115,7 +112,7 @@ public class TokenStream {
                     } else {
                         t.setType("Operator"); 
                         t.setValue(String.valueOf(currentChar));
-                        nextChar = readChar(); // Consume the character
+                        // nextChar holds the lookahead, correct for next token
                     }
                     return t;
 
@@ -124,11 +121,10 @@ public class TokenStream {
                     t.setType("Operator");
                     if (nextChar == '*') {
                         t.setValue(String.valueOf(currentChar)); // Return the first *
-                        // nextChar still holds the second '*', ready for the next nextToken() call.
-                        // DO NOT call readChar().
+                        // DO NOT consume the second '*', let the next call handle it.
                     } else {
                         t.setValue(String.valueOf(currentChar));
-                        nextChar = readChar(); // Consume the character
+                        // nextChar holds the lookahead, correct for next token
                     }
                     return t;
                     
@@ -141,7 +137,7 @@ public class TokenStream {
                     } else {
                         t.setType("Other"); // Single =
                         t.setValue(String.valueOf(currentChar));
-                        nextChar = readChar(); // Consume the character
+                        // nextChar holds the lookahead, correct for next token
                     }
                     return t;
 
@@ -154,7 +150,7 @@ public class TokenStream {
                     } else {
                         t.setType("Other"); // Single :
                         t.setValue(String.valueOf(currentChar));
-                        nextChar = readChar(); // Consume the character
+                        // nextChar holds the lookahead, correct for next token
                     }
                     return t;
 
@@ -167,7 +163,7 @@ public class TokenStream {
                     } else {
                         t.setType("Other"); // Single |
                         t.setValue(String.valueOf(currentChar));
-                        nextChar = readChar(); // Consume the character
+                        // nextChar holds the lookahead, correct for next token
                     }
                     return t;
 
@@ -180,14 +176,15 @@ public class TokenStream {
                     } else {
                         t.setType("Other"); // Single &
                         t.setValue(String.valueOf(currentChar));
-                        nextChar = readChar(); // Consume the character
+                        // nextChar holds the lookahead, correct for next token
                     }
                     return t;
                 
                 default:
+                    // Should not happen if isLookaheadOperator is defined correctly
                     t.setType("Other");
                     t.setValue(String.valueOf(currentChar));
-                    nextChar = readChar(); // Consume the character
+                    // nextChar holds the lookahead, correct for next token
                     return t;
             }
         }
@@ -222,7 +219,7 @@ public class TokenStream {
             return t;
         }
 
-        // 7. Final catch-all for single "Other" characters 
+        // 7. Final catch-all for single "Other" characters (If it gets here, it's an unclassified non-whitespace character)
         if (!isEof) {
             t.setValue(String.valueOf(nextChar));
             nextChar = readChar(); 
@@ -253,6 +250,11 @@ public class TokenStream {
 
     // ================= HELPER METHODS =================
 
+    // New helper to classify operators that require lookahead
+    private boolean isLookaheadOperator(char c) {
+        return (c == '*' || c == '<' || c == '>' || c == '=' || c == '!' || c == '|' || c == '&' || c == ':');
+    }
+    
     private boolean isKeyword(String s) {
         if (s == null) return false;
         switch (s) {
@@ -296,6 +298,7 @@ public class TokenStream {
                 c == ',' || c == ';');
     }
 
+    // This is now only used in the division logic, since the single-character operators are separated.
     private boolean isOperator(char c) {
         return (c == '+' || c == '-' || c == '*' || c == '/' || c == '%' ||
                 c == '<' || c == '>' || c == '=' || c == '!' ||
