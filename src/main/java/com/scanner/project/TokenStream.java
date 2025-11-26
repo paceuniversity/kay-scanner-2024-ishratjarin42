@@ -90,8 +90,7 @@ public class TokenStream {
                     // Single-character Operators. 
                     t.setType("Operator");
                     t.setValue(String.valueOf(currentChar));
-                    // CRITICAL FIX: DO NOT read another character here. nextChar holds the lookahead.
-                    // nextChar = readChar(); // REMOVED
+                    // nextChar holds the lookahead, correct for next token
                     return t; 
                     
                 case '<':
@@ -280,4 +279,36 @@ public class TokenStream {
     }
 
     private boolean isEndOfLine(char c) {
-        return
+        return (c == '\r' || c == '\n' || c == '\f');
+    }
+
+    private void skipWhiteSpace() {
+        while (!isEof && isWhiteSpace(nextChar)) {
+            nextChar = readChar();
+        }
+    }
+
+    private boolean isSeparator(char c) {
+        return (c == '(' || c == ')' ||
+                c == '{' || c == '}' ||
+                c == ',' || c == ';');
+    }
+
+    private boolean isOperator(char c) {
+        return (c == '+' || c == '-' || c == '*' || c == '/' || c == '%' ||
+                c == '<' || c == '>' || c == '=' || c == '!' ||
+                c == '|' || c == '&' || c == '^' || c == '~' || c == ':');
+    }
+
+    private boolean isLetter(char c) {
+        return (c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z');
+    }
+
+    private boolean isDigit(char c) {
+        return (c >= '0' && c <= '9');
+    }
+
+    public boolean isEndofFile() {
+        return isEof;
+    }
+}
