@@ -74,23 +74,26 @@ public class TokenStream {
             return t;
         }
         
-        // 3.5. Guaranteed Single-Character Operators (FIX FOR -5 ISSUE)
-        // These tokens DO NOT have a double-character form, so they should use the simple consume pattern.
-        if (nextChar == '+' || nextChar == '-' || nextChar == '%' || nextChar == '^' || nextChar == '~') {
-            t.setType("Operator");
-            t.setValue(String.valueOf(nextChar));
-            nextChar = readChar();
-            return t;
-        }
-
-        // 4. Lookahead Operators / Others (Only tokens that can be 1 or 2 chars, or have complex single-char rules)
-        if (isLookaheadOperator(nextChar)) {
+        // 4. Operators / Others (Handled via lookahead in switch)
+        if (isOperator(nextChar)) {
             char currentChar = nextChar;
             
             // Advance nextChar for the lookahead before the switch starts (Standard approach)
             nextChar = readChar(); 
 
             switch (currentChar) {
+                case '+':
+                case '-':
+                case '%':
+                case '^':
+                case '~':
+                    // Single-character Operators. 
+                    t.setType("Operator");
+                    t.setValue(String.valueOf(currentChar));
+                    // CRITICAL FIX: DO NOT read another character here. nextChar holds the lookahead.
+                    // nextChar = readChar(); // REMOVED
+                    return t; 
+                    
                 case '<':
                 case '>':
                     t.setType("Operator");
@@ -117,7 +120,7 @@ public class TokenStream {
                     return t;
 
                 case '*': 
-                    // Fix for doubleStarSymbolIsOperatorOperator() test: Treat ** as two separate tokens.
+                    // Treat ** as two separate tokens.
                     t.setType("Operator");
                     if (nextChar == '*') {
                         t.setValue(String.valueOf(currentChar)); // Return the first *
@@ -181,7 +184,6 @@ public class TokenStream {
                     return t;
                 
                 default:
-                    // Should not happen if isLookaheadOperator is defined correctly
                     t.setType("Other");
                     t.setValue(String.valueOf(currentChar));
                     // nextChar holds the lookahead, correct for next token
@@ -219,7 +221,7 @@ public class TokenStream {
             return t;
         }
 
-        // 7. Final catch-all for single "Other" characters (If it gets here, it's an unclassified non-whitespace character)
+        // 7. Final catch-all for single "Other" characters 
         if (!isEof) {
             t.setValue(String.valueOf(nextChar));
             nextChar = readChar(); 
@@ -250,11 +252,6 @@ public class TokenStream {
 
     // ================= HELPER METHODS =================
 
-    // New helper to classify operators that require lookahead
-    private boolean isLookaheadOperator(char c) {
-        return (c == '*' || c == '<' || c == '>' || c == '=' || c == '!' || c == '|' || c == '&' || c == ':');
-    }
-    
     private boolean isKeyword(String s) {
         if (s == null) return false;
         switch (s) {
@@ -283,37 +280,4 @@ public class TokenStream {
     }
 
     private boolean isEndOfLine(char c) {
-        return (c == '\r' || c == '\n' || c == '\f');
-    }
-
-    private void skipWhiteSpace() {
-        while (!isEof && isWhiteSpace(nextChar)) {
-            nextChar = readChar();
-        }
-    }
-
-    private boolean isSeparator(char c) {
-        return (c == '(' || c == ')' ||
-                c == '{' || c == '}' ||
-                c == ',' || c == ';');
-    }
-
-    // This is now only used in the division logic, since the single-character operators are separated.
-    private boolean isOperator(char c) {
-        return (c == '+' || c == '-' || c == '*' || c == '/' || c == '%' ||
-                c == '<' || c == '>' || c == '=' || c == '!' ||
-                c == '|' || c == '&' || c == '^' || c == '~' || c == ':');
-    }
-
-    private boolean isLetter(char c) {
-        return (c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z');
-    }
-
-    private boolean isDigit(char c) {
-        return (c >= '0' && c <= '9');
-    }
-
-    public boolean isEndofFile() {
-        return isEof;
-    }
-}
+        return
